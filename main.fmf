@@ -1,3 +1,4 @@
 component:
   - jose
 contact: Martin Zelený <mzeleny@redhat.com>
+framework: beakerlib
