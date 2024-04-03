@@ -1,0 +1,30 @@
+summary: test plan for jose upstream testing
+
+
+prepare:
+  - how: shell
+    script:
+     - systemctl disable --now dnf-makecache.service || true
+     - systemctl disable --now dnf-makecache.timer || true
+     - dnf makecache
+
+discover:
+  - name: Upstream_tests_clevis
+    how: fmf
+    url: https://github.com/RedHat-SP-Security/clevis-tests
+    ref: master
+    test:
+      - /Sanity/pin-sss
+      - /Sanity/pin-tang
+      - /Sanity/high-availability
+      - /Sanity/bind-luks
+      - /Sanity/simple-encrypt-pin-tang
+      - /Sanity/simple-bind-luks
+  - name: Upstream_tests_ci_jose
+    how: fmf
+    test:
+      - /Sanity
+      - /Regression
+
+execute:
+    how: tmt
