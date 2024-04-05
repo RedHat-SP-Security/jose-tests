@@ -1,0 +1,25 @@
+summary: Run the upstream test suite
+contact: Patrik Koncity <pkoncity@redhat.com>
+test: ./runtest.sh
+recommend:
+  - jose
+  - dnf-utils
+  - gawk
+  - grep
+  - patch
+duration: 10m
+enabled: true
+tag:
+  - NoRHEL4
+  - NoRHEL5
+  - NoRHEL6
+  - NoRHEL7
+  - TIPfail
+  - TIPfail_Security
+  - fedora-wanted
+extra-summary: /jose-tests/Sanity/upstream-test-suite
+extra-task: /jose-tests/Sanity/upstream-test-suite
+adjust:
+  - enabled: false
+    when: distro < rhel-8
+    continue: false

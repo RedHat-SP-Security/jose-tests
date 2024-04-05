@@ -1,0 +1,18 @@
+---
+jobs:
+  - job: tests
+    trigger: pull_request
+    branch: master
+    targets:
+      - fedora-rawhide
+      - fedora-stable
+    skip_build: true
+    tf_extra_params:
+      test:
+        tmt:
+          name: "/Plans/ci"
+      environments:
+        - tmt:
+            context:
+              target_PR_branch: master
+
