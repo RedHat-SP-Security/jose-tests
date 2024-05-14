@@ -49,7 +49,12 @@ rlJournalStart
             ! dnf config-manager --set-enabled "${r}"
         done
 
-        rlRun "dnf builddep -y jose*" 0 "Install jose build dependencies"
+        if rlIsRHEL '>=10'; then
+           # due jansson-devel missing package for rhel-10-beta
+           rlRun "dnf builddep -y jose* --skip-broken --nobest" 0 "Install jose build dependencies"
+        else
+            rlRun "dnf builddep -y jose*" 0 "Install jose build dependencies"
+        fi
 
         # Preparing source and applying existing patches.
         rlRun "SPEC=/root/rpmbuild/SPECS/jose.spec"
