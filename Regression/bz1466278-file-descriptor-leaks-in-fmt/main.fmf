@@ -2,7 +2,7 @@ summary: runs jose fmt via valgrind, checking for leaks
 description: ''
 contact: Martin Zelený <mzeleny@redhat.com>
 test: ./runtest.sh
-recommend:
+require:
 - jose
 - valgrind
 duration: 10m
