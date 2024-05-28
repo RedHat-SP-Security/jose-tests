@@ -1,12 +1,13 @@
 summary: Run the upstream test suite
 contact: Patrik Koncity <pkoncity@redhat.com>
 test: ./runtest.sh
-recommend:
+require:
   - jose
   - dnf-utils
   - gawk
   - grep
   - patch
+  - bzip2
 duration: 10m
 enabled: true
 tag:

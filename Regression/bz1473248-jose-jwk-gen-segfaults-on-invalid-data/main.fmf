@@ -2,7 +2,7 @@ summary: runs jose jwg gen with invalid input
 description: ''
 contact: Martin Zelený <mzeleny@redhat.com>
 test: ./runtest.sh
-recommend:
+require:
 - jose
 duration: 5m
 enabled: true

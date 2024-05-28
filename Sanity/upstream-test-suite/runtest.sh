@@ -35,26 +35,25 @@ rlJournalStart
         rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
         if [ -d /root/rpmbuild ]; then
-            rlRun "rlFileBackup /root/rpmbuild" 0 "Backup rpmbuild directory"
+            rlRun "rlFileBackup --clean /root/rpmbuild" 0 "Backup rpmbuild directory"
             touch backup
         fi
     rlPhaseEnd
 
     rlPhaseStartTest
         rlRun "rlFetchSrcForInstalled jose"
-        rlRun "rpm -Uvh *.src.rpm" 0 "Install jose source rpm"
+        rlRun "JOSE_SRC_RPM=\$(rpm -q --queryformat 'jose-%{VERSION}-%{RELEASE}.src.rpm' jose)"
+        rlRun "rpm -i ${JOSE_SRC_RPM}" 0 "Install jose source rpm"
 
         # Enabling buildroot/CRB so that we can have the build dependencies.
-        for r in rhel-buildroot rhel-CRB rhel-CRB-latest beaker-CRB; do
-            ! dnf config-manager --set-enabled "${r}"
+        for _r in $(dnf repolist --all \
+                    | grep -iE 'crb|codeready|powertools' \
+                    | grep -ivE 'debug|source|latest' \
+                    | awk '{ print $1 }'); do
+            dnf config-manager --set-enabled "${_r}" ||:
         done
 
-        if rlIsRHEL '>=10'; then
-           # due jansson-devel missing package for rhel-10-beta
-           rlRun "dnf builddep -y jose* --skip-broken --nobest" 0 "Install jose build dependencies"
-        else
-            rlRun "dnf builddep -y jose*" 0 "Install jose build dependencies"
-        fi
+        rlRun "dnf builddep -y jose*" 0 "Install jose build dependencies"
 
         # Preparing source and applying existing patches.
         rlRun "SPEC=/root/rpmbuild/SPECS/jose.spec"
@@ -64,14 +63,32 @@ rlJournalStart
         rlRun "tar xf ${SRCDIR}/jose-*.tar.*" 0 "Unpacking jose source"
         rlRun "pushd jose-*"
             for p in $(grep ^Patch "${SPEC}" | awk '{ print$2 }'); do
-                rlRun "patch -p1 < ${SRCDIR}/${p}" 0 "Applying patch ${p}"
+                _patch="${SRCDIR}/${p}"
+                [ -e "${_patch}" ] || rlFail "Patch ${p} does not exist"
+                rlRun "patch -p1 < \"${_patch}\"" 0 "Applying patch ${p}" || rlFail "Failed to apply patch ${p}"
             done
 
-            rlRun "mkdir build"
-            rlRun "pushd build"
-                rlRun "meson .."
-                rlRun "meson test" 0 "Running upstream test suite"
-            rlRun "popd"
+           # Newer versions of jose (from v11) use meson instead of
+            # autotools.
+            MESON=
+            [ -e "meson.build" ] && MESON=1
+
+            if [ -n "${MESON}" ]; then
+                rlRun "mkdir build"
+                rlRun "pushd build"
+                    rlRun "meson setup .."
+                    rlRun "ninja"
+                    rlRun "meson test" 0 "Running upstream test suite"
+                rlRun "popd"
+            else
+                rlLogWarning "This is an old (< v11) version of jose that does not use meson"
+                rlRun "dnf install -y automake autoconf libtool" 0 "Extra deps to build using autotools"
+
+                rlRun "autoreconf -if"
+                rlRun "./configure"
+                rlRun "make"
+                rlRun "make check"
+            fi
         rlRun "popd"
     rlPhaseEnd
 
