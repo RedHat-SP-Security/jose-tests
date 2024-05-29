@@ -10,6 +10,7 @@ recommend:
 duration: 10m
 enabled: true
 tag:
+  - CI-Tier-1
   - NoRHEL4
   - NoRHEL5
   - NoRHEL6
