@@ -13,6 +13,7 @@ tag:
 - TIPfail_Security
 - Tier1
 - Tier1security
+- ImageMode
 tier: '1'
 extra-summary: /CoreOS/jose/Regression/bz1473248-jose-jwk-gen-segfaults-on-invalid-data
 extra-task: /CoreOS/jose/Regression/bz1473248-jose-jwk-gen-segfaults-on-invalid-data
