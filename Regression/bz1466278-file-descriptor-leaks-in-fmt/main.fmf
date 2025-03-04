@@ -15,6 +15,7 @@ tag:
 - TIPfail_Security
 - Tier1
 - Tier1security
+- ImageMode
 tier: '1'
 extra-summary: /CoreOS/jose/Regression/bz1466278-file-descriptor-leaks-in-fmt
 extra-task: /CoreOS/jose/Regression/bz1466278-file-descriptor-leaks-in-fmt
