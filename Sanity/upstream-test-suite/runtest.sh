@@ -39,6 +39,9 @@ rlJournalStart
 
         [ -e /run/ostree-booted ] && IS_IMAGE_MODE=1
 
+        # Ensure rpmbuild directories exist
+        rlRun "mkdir -p /root/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}" 0 "Creating rpmbuild directories"
+
         if [ -d /root/rpmbuild ]; then
             rlRun "rlFileBackup --clean /root/rpmbuild" 0 "Backup rpmbuild directory"
             touch backup
@@ -61,7 +64,25 @@ rlJournalStart
 
             rlRun "dnf builddep -y jose*" 0 "Install jose build dependencies"
         else
-            rlLog "Image mode detected, skipping repo enable and builddep"
+            rlLog "Image mode detected."
+            rlLog "Attempting to locate and copy jose source and spec file."
+
+            JOSE_SOURCE_TARBALL=$(find / -name "jose-*.tar.*" -print -quit 2>/dev/null) 
+            JOSE_SPEC_FILE=$(find / -name "jose.spec" -print -quit 2>/dev/null) 
+
+            if [ -z "$JOSE_SOURCE_TARBALL" ]; then
+                rlDie "In Image mode, jose source tarball not found. Please ensure it's pre-installed or copied to a known location in the image."
+            else
+                rlRun "cp \"$JOSE_SOURCE_TARBALL\" /root/rpmbuild/SOURCES/" 0 "Copying jose source tarball to rpmbuild"
+            fi
+
+            if [ -z "$JOSE_SPEC_FILE" ]; then
+                rlDie "In Image mode, jose.spec not found. Please ensure it's pre-installed or copied to a known location in the image."
+            else
+                rlRun "cp \"$JOSE_SPEC_FILE\" /root/rpmbuild/SPECS/" 0 "Copying jose.spec to rpmbuild"
+            fi
+
+            rlLog "Image mode: assuming build dependencies are preinstalled."
         fi
 
         # Preparing source and applying existing patches.
@@ -71,13 +92,14 @@ rlJournalStart
         rlRun "rm -rf jose-*"
         rlRun "tar xf ${SRCDIR}/jose-*.tar.*" 0 "Unpacking jose source"
         rlRun "pushd jose-*"
+            # Loop for patches should be fine as long as SPEC is found
             for p in $(grep ^Patch "${SPEC}" | awk '{ print$2 }'); do
                 _patch="${SRCDIR}/${p}"
                 [ -e "${_patch}" ] || rlFail "Patch ${p} does not exist"
                 rlRun "patch -p1 < \"${_patch}\"" 0 "Applying patch ${p}" || rlFail "Failed to apply patch ${p}"
             done
 
-           # Newer versions of jose (from v11) use meson instead of
+            # Newer versions of jose (from v11) use meson instead of
             # autotools.
             MESON=
             [ -e "meson.build" ] && MESON=1
@@ -105,12 +127,18 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartCleanup
+        # The rlFileBackup/Restore handles /root/rpmbuild correctly.
         rlRun "rm -rf /root/rpmbuild" 0 "Removing rpmbuild directory"
         if [ -e backup ]; then
             rlRun "rlFileRestore" 0 "Restore previous rpmbuild directory"
         fi
 
-        rlRun "popd"
+        # Added a check for directory stack before popd to avoid errors if pushd failed previously
+        if [ "$(dirs -p | wc -l)" -gt 1 ]; then # Check if there's more than just the current directory in stack
+            rlRun "popd"
+        else
+            rlLog "Directory stack is empty, skipping popd."
+        fi
         rlRun "rm -r ${TmpDir}" 0 "Removing tmp directory"
     rlPhaseEnd
 rlJournalPrintText
