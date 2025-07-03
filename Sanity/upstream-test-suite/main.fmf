@@ -19,7 +19,6 @@ tag:
   - TIPfail
   - TIPfail_Security
   - fedora-wanted
-  - ImageMode
 extra-summary: /jose-tests/Sanity/upstream-test-suite
 extra-task: /jose-tests/Sanity/upstream-test-suite
 adjust:
