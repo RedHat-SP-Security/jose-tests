@@ -3,11 +3,16 @@ contact: Patrik Koncity <pkoncity@redhat.com>
 test: ./runtest.sh
 require:
   - jose
+  - meson
+  - ninja-build
   - dnf-utils
   - gawk
   - grep
   - patch
   - bzip2
+  - automake
+  - autoconf
+  - libtool
 duration: 10m
 enabled: true
 tag:

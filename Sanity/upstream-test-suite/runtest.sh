@@ -29,6 +29,9 @@
 . /usr/bin/rhts-environment.sh || :
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
+IS_IMAGE_MODE=0
+[ -e /run/ostree-booted ] && IS_IMAGE_MODE=1
+
 rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm "jose" || rlDie
@@ -41,19 +44,23 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest
-        rlRun "rlFetchSrcForInstalled jose"
-        rlRun "JOSE_SRC_RPM=\$(rpm -q --queryformat 'jose-%{VERSION}-%{RELEASE}.src.rpm' jose)"
-        rlRun "rpm -i ${JOSE_SRC_RPM}" 0 "Install jose source rpm"
+        if [ "$IS_IMAGE_MODE" -eq 0 ]; then
+            rlRun "rlFetchSrcForInstalled jose"
+            rlRun "JOSE_SRC_RPM=\$(rpm -q --queryformat 'jose-%{VERSION}-%{RELEASE}.src.rpm' jose)"
+            rlRun "rpm -i ${JOSE_SRC_RPM}" 0 "Install jose source rpm"
 
-        # Enabling buildroot/CRB so that we can have the build dependencies.
-        for _r in $(dnf repolist --all \
-                    | grep -iE 'crb|codeready|powertools' \
-                    | grep -ivE 'debug|source|latest' \
-                    | awk '{ print $1 }'); do
-            dnf config-manager --set-enabled "${_r}" ||:
-        done
+            # Enabling buildroot/CRB so that we can have the build dependencies.
+            for _r in $(dnf repolist --all \
+                        | grep -iE 'crb|codeready|powertools' \
+                        | grep -ivE 'debug|source|latest' \
+                        | awk '{ print $1 }'); do
+                dnf config-manager --set-enabled "${_r}" ||:
+            done
 
-        rlRun "dnf builddep -y jose*" 0 "Install jose build dependencies"
+            rlRun "dnf builddep -y jose*" 0 "Install jose build dependencies"
+        else
+            rlLog "Image mode detected, skipping repo enable and builddep"
+        fi
 
         # Preparing source and applying existing patches.
         rlRun "SPEC=/root/rpmbuild/SPECS/jose.spec"
@@ -82,8 +89,11 @@ rlJournalStart
                 rlRun "popd"
             else
                 rlLogWarning "This is an old (< v11) version of jose that does not use meson"
-                rlRun "dnf install -y automake autoconf libtool" 0 "Extra deps to build using autotools"
-
+                if [ "$IS_IMAGE_MODE" -eq 0 ]; then
+                    rlRun "dnf install -y automake autoconf libtool" 0 "Extra deps to build using autotools"
+                else
+                    rlLog "Image mode: assuming autotools deps are preinstalled"
+                fi
                 rlRun "autoreconf -if"
                 rlRun "./configure"
                 rlRun "make"
