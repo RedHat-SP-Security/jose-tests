@@ -30,13 +30,15 @@
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 IS_IMAGE_MODE=0
-[ -e /run/ostree-booted ] && IS_IMAGE_MODE=1
 
 rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm "jose" || rlDie
         rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
+
+        [ -e /run/ostree-booted ] && IS_IMAGE_MODE=1
+
         if [ -d /root/rpmbuild ]; then
             rlRun "rlFileBackup --clean /root/rpmbuild" 0 "Backup rpmbuild directory"
             touch backup
