@@ -3,20 +3,21 @@ description: ''
 contact: Martin Zelený <mzeleny@redhat.com>
 test: ./runtest.sh
 require:
-- jose
-- valgrind
+  - jose
+  - valgrind
 duration: 10m
 enabled: true
 tag:
-- CI-Tier-1
-- NoRHEL4
-- NoRHEL5
-- NoRHEL6
-- TIPfail_Security
-- Tier1
-- Tier1security
-- ImageMode
+  - CI-Tier-1
+  - NoRHEL4
+  - NoRHEL5
+  - NoRHEL6
+  - TIPfail_Security
+  - Tier1
+  - Tier1security
+  - ImageMode
 tier: '1'
 extra-summary: /CoreOS/jose/Regression/bz1466278-file-descriptor-leaks-in-fmt
 extra-task: /CoreOS/jose/Regression/bz1466278-file-descriptor-leaks-in-fmt
 extra-nitrate: TC#0561563
+id: d40d77c1-42dd-4980-bcef-dae7f41c96cd
