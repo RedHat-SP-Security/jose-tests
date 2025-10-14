@@ -3,18 +3,21 @@ description: ''
 contact: Martin Zelený <mzeleny@redhat.com>
 test: ./runtest.sh
 require:
-- jose
+  - jose
 duration: 5m
 enabled: true
 tag:
-- CI-Tier-1
-- NoRHEL4
-- NoRHEL5
-- TIPfail_Security
-- Tier1
-- Tier1security
-- ImageMode
+  - CI-Tier-1
+  - NoRHEL4
+  - NoRHEL5
+  - TIPfail_Security
+  - Tier1
+  - Tier1security
+  - ImageMode
 tier: '1'
-extra-summary: /CoreOS/jose/Regression/bz1473248-jose-jwk-gen-segfaults-on-invalid-data
-extra-task: /CoreOS/jose/Regression/bz1473248-jose-jwk-gen-segfaults-on-invalid-data
+extra-summary: 
+    /CoreOS/jose/Regression/bz1473248-jose-jwk-gen-segfaults-on-invalid-data
+extra-task: 
+    /CoreOS/jose/Regression/bz1473248-jose-jwk-gen-segfaults-on-invalid-data
 extra-nitrate: TC#0561564
+id: 68de3b23-c42c-49e3-8462-28d2002e0a50
