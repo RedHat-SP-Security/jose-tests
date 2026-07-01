@@ -1,5 +1,9 @@
 summary: runs jose jwg gen with invalid input
-description: ''
+description: |
+    Verify that jose jwk gen handles invalid input gracefully without segfaulting,
+    by running it with valid JSON, an empty file, and an invalid JSON file, and
+    confirming it exits successfully for valid input and returns an error for
+    invalid or empty input.
 contact: Martin Zelený <mzeleny@redhat.com>
 test: ./runtest.sh
 require:

@@ -1,5 +1,8 @@
 summary: runs jose fmt via valgrind, checking for leaks
-description: ''
+description: |
+    Verify that jose fmt does not leak file descriptors when using the -o (output)
+    and -f (foreach) options, by running the command under valgrind with file
+    descriptor tracking enabled and checking that no descriptors remain open.
 contact: Martin Zelený <mzeleny@redhat.com>
 test: ./runtest.sh
 require:
