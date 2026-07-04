@@ -1,4 +1,9 @@
 summary: Run the upstream test suite
+description: |
+    Verify that jose passes its upstream test suite by fetching the source RPM,
+    installing build dependencies, applying distribution patches, building from
+    source using meson (or autotools for older versions), and running the
+    upstream tests.
 contact: Patrik Koncity <pkoncity@redhat.com>
 test: ./runtest.sh
 require:
