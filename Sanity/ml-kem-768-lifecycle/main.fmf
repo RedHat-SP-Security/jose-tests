@@ -1,0 +1,22 @@
+summary: Test ML-KEM-768 lifecycle and static vector
+description: |
+    Exercises ML-KEM-768 key generation and public-key extraction, an
+    encapsulation/decapsulation round-trip, a static FIPS 203 vector fixture,
+    malformed inputs, and implicit rejection of corrupted ciphertexts.
+contact: Patrik Koncity <pkoncity@redhat.com>
+component:
+  - jose
+test: ./runtest.sh
+framework: beakerlib
+require:
+  - jq
+  - openssl-devel
+  - pkgconf-pkg-config
+duration: 10m
+enabled: true
+tag:
+  - pqc
+adjust:
+  - enabled: false
+    when: distro < rhel-10.4
+    continue: false
