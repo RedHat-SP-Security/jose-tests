@@ -1,0 +1,23 @@
+summary: Build and install an upstream jose revision
+description: |
+    Fetches from the canonical jose repository at the revision selected by
+    JOSE_UPSTREAM_REF (default: master), optionally verifies it against
+    JOSE_EXPECTED_COMMIT, builds it, and installs it under /usr/local.
+contact: Patrik Koncity <pkoncity@redhat.com>
+component:
+  - jose
+test: ./runtest.sh
+framework: beakerlib
+require:
+  - gcc
+  - git
+  - jansson-devel
+  - meson
+  - ninja-build
+  - openssl-devel
+  - pkgconf-pkg-config
+  - zlib-devel
+duration: 20m
+enabled: true
+tag:
+  - setup

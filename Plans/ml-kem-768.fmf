@@ -1,0 +1,19 @@
+summary: Build upstream jose and test ML-KEM-768
+
+environment:
+  JOSE_UPSTREAM_REF: refs/pull/184/head
+  JOSE_EXPECTED_COMMIT: d3b516584895bfabd43b1e15389a6fbbf646d9dc
+
+discover:
+  how: fmf
+  test:
+    - /Setup/install-upstream-jose
+    - /Sanity/ml-kem-768-lifecycle
+
+adjust:
+  - enabled: false
+    when: distro < rhel-10.4
+    continue: false
+
+execute:
+  how: tmt
