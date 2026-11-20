@@ -2,12 +2,16 @@ summary: Build upstream jose and test ML-KEM-768
 
 environment:
   JOSE_UPSTREAM_REF: refs/pull/184/head
-  JOSE_EXPECTED_COMMIT: d3b516584895bfabd43b1e15389a6fbbf646d9dc
+  JOSE_EXPECTED_COMMIT: ee6ed22ef89b33bb5bbeeeaefbfb021faecbd274
+  JOSE_BUILD_DIR: /var/tmp/jose-upstream/build
+  JOSE_REQUIRE_PQC_TESTS: "yes"
+  JOSE_BIN: /usr/local/bin/jose
 
 discover:
   how: fmf
   test:
     - /Setup/install-upstream-jose
+    - /Sanity/upstream-test-suite
     - /Sanity/ml-kem-768-lifecycle
 
 adjust:

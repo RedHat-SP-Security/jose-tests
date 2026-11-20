@@ -1,5 +1,29 @@
 #!/bin/bash
 # vim: dict+=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#   runtest.sh of /jose-tests/Setup/install-upstream-jose
+#   Description: Build and install an upstream jose revision
+#   Author: Patrik Koncity <pkoncity@redhat.com>
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#   Copyright (c) 2026 Red Hat, Inc.
+#
+#   This program is free software: you can redistribute it and/or
+#   modify it under the terms of the GNU General Public License as
+#   published by the Free Software Foundation, either version 2 of
+#   the License, or (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be
+#   useful, but WITHOUT ANY WARRANTY; without even the implied
+#   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#   PURPOSE.  See the GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program. If not, see http://www.gnu.org/licenses/.
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
@@ -42,12 +66,15 @@ rlJournalStart
             read -r INSTALLED_COMMIT < "${JOSE_INSTALLED_COMMIT_FILE}"
         fi
 
+        rlRun "meson setup '${JOSE_BUILD_DIR}' '${JOSE_SOURCE_DIR}' --prefix=/usr/local --libdir=lib -Ddocs=disabled" 0 "Configure upstream jose" || \
+            rlDie "Failed to configure upstream jose"
+        rlRun "meson compile -C '${JOSE_BUILD_DIR}'" 0 "Build jose" || \
+            rlDie "Failed to build upstream jose"
+
         if [[ "${INSTALLED_COMMIT}" == "${ACTUAL_COMMIT}" && \
               -x /usr/local/bin/jose && -e /usr/local/lib/libjose.so.0 ]]; then
-            rlLogInfo "Selected jose commit is already installed; skipping build and install"
+            rlLogInfo "Selected jose commit is already installed; keeping the existing installation"
         else
-            rlRun "meson setup '${JOSE_BUILD_DIR}' '${JOSE_SOURCE_DIR}' --prefix=/usr/local --libdir=lib -Ddocs=disabled" 0 "Configure upstream jose"
-            rlRun "meson compile -C '${JOSE_BUILD_DIR}'" 0 "Build jose"
             rlRun "meson install -C '${JOSE_BUILD_DIR}'" 0 "Install the upstream jose build" || rlDie "Build succeeded but install failed; check the build logs for details"
         fi
 

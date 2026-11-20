@@ -19,5 +19,11 @@ require:
   - zlib-devel
 duration: 20m
 enabled: true
+order: 10
 tag:
   - setup
+adjust:
+  - enabled: false
+    when: distro < rhel-10.4
+    continue: false
+id: 0f1a48b4-f08f-4110-ab6c-d95425955ab1

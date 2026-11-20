@@ -9,14 +9,20 @@ component:
 test: ./runtest.sh
 framework: beakerlib
 require:
+  - jose
   - jq
   - openssl-devel
   - pkgconf-pkg-config
 duration: 10m
 enabled: true
+order: 30
 tag:
   - pqc
+  - CI-Tier-1
+  - Tier1
+tier: '1'
 adjust:
   - enabled: false
     when: distro < rhel-10.4
     continue: false
+id: 9a68d5d3-8247-4a1b-8568-fc915b9ee587

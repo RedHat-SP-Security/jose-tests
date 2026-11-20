@@ -1,11 +1,35 @@
 #!/bin/bash
 # vim: dict+=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#   runtest.sh of /jose-tests/Sanity/ml-kem-768-lifecycle
+#   Description: Test the ML-KEM-768 lifecycle and static vector
+#   Author: Patrik Koncity <pkoncity@redhat.com>
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#   Copyright (c) 2026 Red Hat, Inc.
+#
+#   This program is free software: you can redistribute it and/or
+#   modify it under the terms of the GNU General Public License as
+#   published by the Free Software Foundation, either version 2 of
+#   the License, or (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be
+#   useful, but WITHOUT ANY WARRANTY; without even the implied
+#   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#   PURPOSE.  See the GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program. If not, see http://www.gnu.org/licenses/.
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
-JOSE_BIN="/usr/local/bin/jose"
+JOSE_BIN="${JOSE_BIN:-$(command -v jose)}"
 TEST_DIR="${PWD}"
-VECTOR_FIXTURE="${TEST_DIR}/data/ml-kem-768-fips203-vector.json"
+VECTOR_FIXTURE="${TEST_DIR}/ml-kem-768-fips203-vector.json"
 
 b64url_size() {
     local value="$1"
@@ -42,8 +66,8 @@ rlJournalStart
             rlDie "OpenSSL 3.5 or newer is required for ML-KEM"
         fi
 
-        rlRun "TmpDir=\$(mktemp -d)" 0 "Create a temporary test directory"
-        rlRun "pushd '${TmpDir}'"
+        rlRun "TmpDir=\$(mktemp -d)" 0 "Create a temporary test directory" || rlDie "Failed to create a temporary test directory"
+        rlRun "pushd '${TmpDir}'" 0 "Enter the temporary test directory" || rlDie "Failed to enter the temporary test directory"
         rlRun "${JOSE_BIN} jwk gen -i '{\"alg\":\"ML-KEM-768\"}' > private.jwk" 0 "Generate an ML-KEM-768 key" || rlDie "The installed jose binary could not generate an ML-KEM-768 key"
     rlPhaseEnd
 
