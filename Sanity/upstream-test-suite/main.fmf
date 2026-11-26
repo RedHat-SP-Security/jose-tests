@@ -1,9 +1,10 @@
 summary: Run the upstream test suite
 description: |
-    Verify that jose passes its upstream test suite by fetching the source RPM,
-    installing build dependencies, applying distribution patches, building from
-    source using meson (or autotools for older versions), and running the
-    upstream tests.
+    Verify that jose passes its upstream test suite. By default, fetch the
+    source RPM, apply distribution patches, build it, and run its tests. A
+    configured JOSE_BUILD_DIR can be used to run the suite against an existing
+    upstream build. When JOSE_REQUIRE_PQC_TESTS is enabled, require the ML-KEM
+    Meson tests to be present and pass.
 contact: Patrik Koncity <pkoncity@redhat.com>
 test: ./runtest.sh
 require:
@@ -13,8 +14,14 @@ require:
   - grep
   - patch
   - bzip2
+  - meson
+  - ninja-build
+  - openssl-devel
+  - pkgconf-pkg-config
+  - python3
 duration: 10m
 enabled: true
+order: 20
 tag:
   - CI-Tier-1
   - NoRHEL4
